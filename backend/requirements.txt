@@ -1,0 +1,10 @@
+fastapi==0.95.1
+uvicorn==0.21.1
+pydantic==1.10.7
+sqlalchemy==2.0.9
+azure-cognitiveservices-speech==1.25.0
+azure-storage-blob==12.16.0
+python-multipart==0.0.6
+langchain==0.0.167
+alembic==1.10.3
+python-dotenv==1.0.0

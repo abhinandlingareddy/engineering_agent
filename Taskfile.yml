@@ -1,0 +1,159 @@
+version: '3'
+
+vars:
+  FRONTEND_DIR: frontend
+  BACKEND_DIR: backend
+  VENV_DIR: 'engineering_agent'
+
+tasks:
+  default:
+    cmds:
+      - task --list
+    desc: Lists all available tasks
+
+  setup:
+    desc: Setup development environment
+    cmds:
+      - task: setup:frontend
+      - task: setup:backend
+      - task: update-vscode
+    
+  setup:frontend:
+    desc: Setup frontend dependencies
+    dir: '{{.FRONTEND_DIR}}'
+    cmds:
+      - npm install
+    
+  setup:backend:
+    desc: Setup backend dependencies and environment
+    dir: '{{.BACKEND_DIR}}'
+    cmds:
+      - python3 -m venv ../{{.VENV_DIR}}
+      - "../{{.VENV_DIR}}/bin/pip install -U pip setuptools wheel"
+      - "../{{.VENV_DIR}}/bin/pip install -r requirements.txt"
+      - cp .env.example .env || true
+      - echo "Please update the .env file with your Azure credentials"
+
+  dev:
+    desc: Run both frontend and backend in development mode
+    cmds:
+      - task: dev:backend &
+      - task: dev:frontend
+
+  dev:frontend:
+    desc: Run frontend development server
+    dir: '{{.FRONTEND_DIR}}'
+    cmds:
+      - npm start
+
+  dev:backend:
+    desc: Run backend development server
+    dir: '{{.BACKEND_DIR}}'
+    cmds:
+      - "../{{.VENV_DIR}}/bin/python -m uvicorn app.main:app --reload --port 8000"
+
+  build:
+    desc: Build both frontend and backend
+    cmds:
+      - task: build:frontend
+      - task: build:backend
+
+  build:frontend:
+    desc: Build frontend for production
+    dir: '{{.FRONTEND_DIR}}'
+    cmds:
+      - npm run build
+
+  build:backend:
+    desc: Build backend (create installable package)
+    dir: '{{.BACKEND_DIR}}'
+    cmds:
+      - echo "Building backend..."
+      - "../{{.VENV_DIR}}/bin/python setup.py sdist bdist_wheel"
+
+  lint:
+    desc: Lint both frontend and backend code
+    cmds:
+      - task: lint:frontend
+      - task: lint:backend
+
+  lint:frontend:
+    desc: Lint frontend code
+    dir: '{{.FRONTEND_DIR}}'
+    cmds:
+      - npm run lint || echo "Linting not configured in frontend"
+
+  lint:backend:
+    desc: Lint backend code
+    dir: '{{.BACKEND_DIR}}'
+    cmds:
+      - "../{{.VENV_DIR}}/bin/flake8 || echo \"flake8 not installed\""
+      - "../{{.VENV_DIR}}/bin/black . --check || echo \"black not installed\""
+
+  clean:
+    desc: Clean build artifacts
+    cmds:
+      - task: clean:frontend
+      - task: clean:backend
+
+  clean:frontend:
+    desc: Clean frontend build artifacts
+    dir: '{{.FRONTEND_DIR}}'
+    cmds:
+      - rm -rf build
+      - rm -rf node_modules/.cache
+
+  clean:backend:
+    desc: Clean backend build artifacts
+    dir: '{{.BACKEND_DIR}}'
+    cmds:
+      - rm -rf dist
+      - rm -rf build
+      - find . -name "*.pyc" -delete
+      - find . -name "__pycache__" -delete
+
+  clean:venv:
+    desc: Remove Python virtual environment
+    cmds:
+      - rm -rf {{.VENV_DIR}}
+
+  venv:create:
+    desc: Create Python virtual environment
+    cmds:
+      - python3 -m venv {{.VENV_DIR}}
+      - "{{.VENV_DIR}}/bin/pip install -U pip setuptools wheel"
+
+  venv:activate:
+    desc: Print command to activate virtual environment (source it manually)
+    cmds:
+      - source {{.VENV_DIR}}/bin/activate
+
+  create-venv:
+    desc: Create the engineering_agent Python virtual environment
+    cmds:
+      - python -m venv engineering_agent
+
+  install-deps:
+    desc: Install Python dependencies
+    cmds:
+      - "../{{.VENV_DIR}}/bin/pip install -r requirements.txt"
+
+  update-vscode:
+    desc: Ensure VSCode settings are configured for the engineering_agent environment
+    cmds:
+      - mkdir -p .vscode
+      - |
+        cat > .vscode/settings.json << 'EOF'
+        {
+            "python.defaultInterpreterPath": "${workspaceFolder}/{{.VENV_DIR}}/bin/python",
+            "python.terminal.activateEnvironment": true,
+            "python.linting.enabled": true,
+            "python.formatting.provider": "black"
+        }
+        EOF
+      - echo "VSCode settings updated. Restart VSCode or reload window."
+
+  run:
+    desc: Run the application
+    cmds:
+      - ./engineering_agent/bin/python main.py

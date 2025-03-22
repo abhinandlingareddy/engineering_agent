@@ -1,0 +1,29 @@
+# Python-related
+*.pyc
+__pycache__/
+*.pyo
+*.pyd
+*.env
+*.venv
+engineering_agent/
+
+# VSCode-related
+.vscode/
+
+# Node.js-related
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Build artifacts
+build/
+dist/
+*.egg-info/
+
+# Logs
+*.log
+
+# OS-specific
+.DS_Store
+Thumbs.db
