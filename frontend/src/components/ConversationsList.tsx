@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { List, ListItem, ListItemText, ListItemButton, IconButton, Typography, Paper, Box, Divider } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { format } from 'date-fns';
-import { Conversation } from '../types';
-import { conversationService } from '../services/api';
+import { Conversation } from '../types.ts';
+import { conversationService } from '../services/api.ts';
 
 interface ConversationListProps {
   onSelectConversation: (conversation: Conversation) => void;

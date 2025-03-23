@@ -1,7 +1,7 @@
 import React from 'react';
 import { Paper, Typography, Box, Divider, Chip } from '@mui/material';
 import { format } from 'date-fns';
-import { Conversation } from '../types';
+import { Conversation } from '../types.ts';
 
 interface ConversationDetailProps {
   conversation: Conversation | null;

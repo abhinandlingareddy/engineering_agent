@@ -2,7 +2,7 @@ import React, { useState, useRef } from 'react';
 import { Button, Box, Typography, CircularProgress } from '@mui/material';
 import MicIcon from '@mui/icons-material/Mic';
 import StopIcon from '@mui/icons-material/Stop';
-import { conversationService } from '../services/api';
+import { conversationService } from '../services/api.ts';
 
 interface RecordingControlProps {
   onRecordingComplete: (conversationId: string) => void;

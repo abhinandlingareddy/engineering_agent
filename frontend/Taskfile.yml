@@ -29,7 +29,7 @@ tasks:
   format:
     desc: Format frontend code
     cmds:
-      - npm run format || npx prettier --write "src/**/*.{js,jsx,ts,tsx}"
+      - npm run format || npx prettier --write "src/**/*.{js,jsx,ts,tsx,json,css,scss,md}"
       
   clean:
     desc: Clean frontend build artifacts
@@ -47,7 +47,7 @@ tasks:
   analyze:
     desc: Analyze bundle size
     cmds:
-      - npx source-map-explorer 'build/static/js/*.js' || npm run build && npx source-map-explorer 'build/static/js/*.js'
+      - npm run build && npx source-map-explorer 'build/static/js/*.js'
       
   storybook:
     desc: Run Storybook if available

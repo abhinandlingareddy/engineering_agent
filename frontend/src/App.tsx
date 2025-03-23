@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { Container, Grid, CssBaseline, AppBar, Toolbar, Typography, Box, ThemeProvider, createTheme } from '@mui/material';
-import RecordingControl from './components/RecordingControl';
-import ConversationList from './components/ConversationList';
-import ConversationDetail from './components/ConversationDetail';
-import { Conversation } from './types';
+import RecordingControl from './components/RecordingControl.tsx';
+import { Conversation } from './types.ts';
+import ConversationList from './components/ConversationsList.tsx';
+import ConversationDetails from './components/ConversationDetails.tsx';
 
 const theme = createTheme({
   palette: {
@@ -48,7 +48,7 @@ function App() {
             />
           </Grid>
           <Grid item xs={12} md={7}>
-            <ConversationDetail conversation={selectedConversation} />
+            <ConversationDetails conversation={selectedConversation} />
           </Grid>
         </Grid>
       </Container>
