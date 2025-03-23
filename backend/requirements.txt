@@ -17,3 +17,14 @@ httpx>=0.24.0
 # Code quality
 black>=23.3.0
 flake8>=6.0.0
+
+# 'azure-sdk' is not a standard package, use specific packages instead
+azure-core>=1.24.0  # Core functionality for Azure SDKs
+azure-identity>=1.5.0
+azure-storage-blob>=12.8.1
+azure-cosmos>=4.3.0  # For Cosmos DB
+azure-keyvault-secrets>=4.3.0  # For Key Vault secrets
+azure-mgmt-resource>=21.0.0  # For Azure Resource Management
+# Additional Azure packages can be added as needed for specific services
+azure-cognitiveservices-speech>=1.25.0  # Speech recognition capabilities
+

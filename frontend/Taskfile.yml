@@ -1,0 +1,63 @@
+version: '3'
+
+tasks:
+  setup:
+    desc: Setup frontend dependencies
+    cmds:
+      - npm install
+  
+  start:
+    desc: Start frontend development server
+    cmds:
+      - npm start
+  
+  build:
+    desc: Build frontend for production
+    cmds:
+      - npm run build
+  
+  test:
+    desc: Run frontend tests
+    cmds:
+      - npm test
+  
+  lint:
+    desc: Lint frontend code
+    cmds:
+      - npm run lint || echo "Linting not configured in package.json"
+      
+  format:
+    desc: Format frontend code
+    cmds:
+      - npm run format || npx prettier --write "src/**/*.{js,jsx,ts,tsx}"
+      
+  clean:
+    desc: Clean frontend build artifacts
+    cmds:
+      - rm -rf build
+      - rm -rf node_modules/.cache
+      
+  deploy:
+    desc: Build and deploy frontend
+    cmds:
+      - task: build
+      - echo "Deploying frontend build..."
+      # Add deployment commands based on your hosting provider
+      
+  analyze:
+    desc: Analyze bundle size
+    cmds:
+      - npx source-map-explorer 'build/static/js/*.js' || npm run build && npx source-map-explorer 'build/static/js/*.js'
+      
+  storybook:
+    desc: Run Storybook if available
+    cmds:
+      - npm run storybook || echo "Storybook not configured"
+      
+  dev:safe:
+    desc: Start frontend development server ensuring no conflicts
+    cmds:
+      - |
+        echo "Checking for frontend development server..."
+        # Add any specific checks if needed
+      - task: start

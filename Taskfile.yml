@@ -52,6 +52,17 @@ tasks:
     cmds:
       - "../{{.VENV_DIR}}/bin/python -m uvicorn app.main:app --reload --port 8000"
 
+  dev:backend:safe:
+    desc: Kill process on port 8000 and run backend development server
+    cmds:
+      - |
+        pid=$(lsof -ti:8000)
+        if [ ! -z "$pid" ]; then
+          echo "Killing process $pid running on port 8000..."
+          kill -9 $pid
+        fi
+      - task: dev:backend
+
   build:
     desc: Build both frontend and backend
     cmds:
@@ -158,3 +169,86 @@ tasks:
     dir: '{{.BACKEND_DIR}}'
     cmds:
       - "../{{.VENV_DIR}}/bin/python -m uvicorn app.main:app --port 8000"
+
+  test:
+    desc: Run tests for both frontend and backend
+    cmds:
+      - task: test:frontend
+      - task: test:backend
+
+  test:frontend:
+    desc: Run frontend tests
+    dir: '{{.FRONTEND_DIR}}'
+    cmds:
+      - npm test
+
+  test:backend:
+    desc: Run backend tests
+    dir: '{{.BACKEND_DIR}}'
+    cmds:
+      - "../{{.VENV_DIR}}/bin/python -m pytest"
+
+  deploy:
+    desc: Deploy both frontend and backend
+    cmds:
+      - task: deploy:frontend
+      - task: deploy:backend
+
+  deploy:frontend:
+    desc: Deploy frontend to production
+    dir: '{{.FRONTEND_DIR}}'
+    cmds:
+      - task: build:frontend
+      - echo "Deploying frontend build to production server..."
+      # Add deployment commands based on your hosting provider
+
+  deploy:backend:
+    desc: Deploy backend to production
+    dir: '{{.BACKEND_DIR}}'
+    cmds:
+      - task: build:backend
+      - echo "Deploying backend to production server..."
+      # Add deployment commands based on your hosting provider
+
+  db:migrate:
+    desc: Run database migrations
+    dir: '{{.BACKEND_DIR}}'
+    cmds:
+      - "../{{.VENV_DIR}}/bin/python -m alembic upgrade head || echo \"Alembic not configured\""
+      
+  db:rollback:
+    desc: Rollback last database migration
+    dir: '{{.BACKEND_DIR}}'
+    cmds:
+      - "../{{.VENV_DIR}}/bin/python -m alembic downgrade -1 || echo \"Alembic not configured\""
+      
+  format:
+    desc: Format code in both frontend and backend
+    cmds:
+      - task: format:frontend
+      - task: format:backend
+      
+  format:frontend:
+    desc: Format frontend code
+    dir: '{{.FRONTEND_DIR}}'
+    cmds:
+      - npm run format || npx prettier --write "src/**/*.{js,jsx,ts,tsx}"
+      
+  format:backend:
+    desc: Format backend code
+    dir: '{{.BACKEND_DIR}}'
+    cmds:
+      - "../{{.VENV_DIR}}/bin/black . || echo \"black not installed\""
+      - "../{{.VENV_DIR}}/bin/isort . || echo \"isort not installed\""
+      
+  analyze:
+    desc: Analyze frontend bundle size
+    dir: '{{.FRONTEND_DIR}}'
+    cmds:
+      - npx source-map-explorer 'build/static/js/*.js' || npm run build && npx source-map-explorer 'build/static/js/*.js'
+      
+  docs:
+    desc: Generate backend API documentation
+    dir: '{{.BACKEND_DIR}}'
+    cmds:
+      - "../{{.VENV_DIR}}/bin/python -m sphinx.cmd.build -b html docs docs/_build || echo \"Sphinx not installed\""

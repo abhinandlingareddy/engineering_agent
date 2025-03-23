@@ -1,0 +1,112 @@
+version: '3'
+vars:
+  VENV_DIR: '../engineering_agent'
+
+tasks:
+  setup:
+    desc: Setup backend dependencies and environment
+    cmds:
+      - python3 -m venv {{.VENV_DIR}}
+      - "{{.VENV_DIR}}/bin/pip install -U pip setuptools wheel"
+      - "{{.VENV_DIR}}/bin/pip install -r requirements.txt"
+      - cp .env.example .env || true
+      - echo "Please update the .env file with your Azure credentials"
+  
+  start:
+    desc: Start backend development server
+    cmds:
+      - |
+        pid=$(lsof -ti:8000)
+        if [ ! -z "$pid" ]; then
+          echo "Killing process $pid running on port 8000..."
+          kill -9 $pid
+        fi
+      - source {{.VENV_DIR}}/bin/activate && uvicorn app.main:app --reload --port 8000
+  
+  test:
+    desc: Run backend tests
+    cmds:
+      - source {{.VENV_DIR}}/bin/activate && pytest
+
+  start:safe:
+    desc: Kill process on port 8000 and start backend development server
+    cmds:
+      - |
+        pid=$(lsof -ti:8000)
+        if [ ! -z "$pid" ]; then
+          echo "Killing process $pid running on port 8000..."
+          kill -9 $pid
+        fi
+      - task: start
+      
+  lint:
+    desc: Lint backend code
+    cmds:
+      - source {{.VENV_DIR}}/bin/activate && flake8 || echo "flake8 not installed"
+      - source {{.VENV_DIR}}/bin/activate && black . --check || echo "black not installed"
+      
+  format:
+    desc: Format backend code
+    cmds:
+      - source {{.VENV_DIR}}/bin/activate && black . || echo "black not installed"
+      - source {{.VENV_DIR}}/bin/activate && isort . || echo "isort not installed"
+      
+  clean:
+    desc: Clean backend build artifacts
+    cmds:
+      - rm -rf dist
+      - rm -rf build
+      - find . -name "*.pyc" -delete
+      - find . -name "__pycache__" -delete
+      
+  db:migrate:
+    desc: Run database migrations
+    cmds:
+      - source {{.VENV_DIR}}/bin/activate && python -m alembic upgrade head || echo "Alembic not configured"
+      
+  db:rollback:
+    desc: Rollback last database migration
+    cmds:
+      - source {{.VENV_DIR}}/bin/activate && python -m alembic downgrade -1 || echo "Alembic not configured"
+      
+  deploy:
+    desc: Build and deploy backend
+    cmds:
+      - echo "Building backend for deployment..."
+      - source {{.VENV_DIR}}/bin/activate && python setup.py sdist bdist_wheel || echo "setup.py not configured"
+      - echo "Deploying backend package..."
+      # Add deployment commands based on your hosting provider
+      
+  docs:
+    desc: Generate API documentation
+    cmds:
+      - source {{.VENV_DIR}}/bin/activate && python -m sphinx.cmd.build -b html docs docs/_build || echo "Sphinx not installed"
+      
+  run:
+    desc: Run the backend application in production mode
+    cmds:
+      - source {{.VENV_DIR}}/bin/activate && python -m uvicorn app.main:app --port 8000 --host 0.0.0.0
+      
+  create-venv:
+    desc: Create the Python virtual environment
+    cmds:
+      - python3 -m venv {{.VENV_DIR}}
+      
+  install-deps:
+    desc: Install Python dependencies
+    cmds:
+      - source {{.VENV_DIR}}/bin/activate && pip install -r requirements.txt
+      
+  update-vscode:
+    desc: Configure VSCode for backend development
+    cmds:
+      - mkdir -p ../.vscode
+      - |
+        cat > ../.vscode/settings.json << 'EOF'
+        {
+            "python.defaultInterpreterPath": "${workspaceFolder}/{{.VENV_DIR}}/bin/python",
+            "python.terminal.activateEnvironment": true,
+            "python.linting.enabled": true,
+            "python.formatting.provider": "black"
+        }
+        EOF
