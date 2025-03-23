@@ -52,7 +52,8 @@ def create_conversation(
     """Create a new conversation"""
     new_conversation = ConversationDB(
         id=str(uuid.uuid4()),
-        title=conversation_data.title
+        title=conversation_data.title,
+        content=""  # Explicitly set content to empty string
     )
     
     db.add(new_conversation)
