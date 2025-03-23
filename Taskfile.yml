@@ -155,5 +155,6 @@ tasks:
 
   run:
     desc: Run the application
+    dir: '{{.BACKEND_DIR}}'
     cmds:
-      - ./engineering_agent/bin/python main.py
+      - "../{{.VENV_DIR}}/bin/python -m uvicorn app.main:app --port 8000"
