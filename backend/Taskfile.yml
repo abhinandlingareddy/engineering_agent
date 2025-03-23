@@ -15,12 +15,6 @@ tasks:
   start:
     desc: Start backend development server
     cmds:
-      - |
-        pid=$(lsof -ti:8000)
-        if [ ! -z "$pid" ]; then
-          echo "Killing process $pid running on port 8000..."
-          kill -9 $pid
-        fi
       - source {{.VENV_DIR}}/bin/activate && uvicorn app.main:app --reload --port 8000
   
   test:

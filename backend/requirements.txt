@@ -5,6 +5,7 @@ pydantic>=2.0.0
 
 # Database
 sqlalchemy>=2.0.0
+alembic>=1.11.0  # Database migrations
 
 # Utilities
 python-dotenv>=1.0.0
@@ -17,6 +18,10 @@ httpx>=0.24.0
 # Code quality
 black>=23.3.0
 flake8>=6.0.0
+isort>=5.12.0  # Import sorting
+
+# Documentation
+sphinx>=7.0.0  # Documentation generation
 
 # 'azure-sdk' is not a standard package, use specific packages instead
 azure-core>=1.24.0  # Core functionality for Azure SDKs
@@ -27,4 +32,6 @@ azure-keyvault-secrets>=4.3.0  # For Key Vault secrets
 azure-mgmt-resource>=21.0.0  # For Azure Resource Management
 # Additional Azure packages can be added as needed for specific services
 azure-cognitiveservices-speech>=1.25.0  # Speech recognition capabilities
+python-multipart>=0.0.5
+typing-extensions>=4.5.0
 
